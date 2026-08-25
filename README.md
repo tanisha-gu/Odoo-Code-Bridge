@@ -4,9 +4,11 @@ Convert backend Python (or JavaScript) code into idiomatic **Odoo ORM Python cod
 
 ## What it does
 
-- Paste plain Python or JavaScript backend/business logic into the left panel.
+- Paste **or upload** (`.py`, `.js`, `.jsx`, `.ts`, `.txt`) plain Python or JavaScript backend/business logic.
 - Click the convert (→) button.
-- Get back Odoo-style Python in the right panel: `models.Model` subclasses, `fields.Char` / `fields.Many2one` / etc., and decorators like `@api.model`, `@api.depends`, `@api.constrains`, `@api.onchange` where appropriate.
+- **Small files (≤300 lines):** converted in a single API call.
+- **Large files (>300 lines, e.g. your 9,235-line file):** automatically split into chunks (~260 lines each, split at top-level `class`/`def`/`function` boundaries where possible) and converted **sequentially, one chunk per API call**, with a live "Converting chunk X of Y" progress indicator. Results stream into the output panel as each chunk finishes.
+- Get back Odoo-style Python: `models.Model` subclasses, `fields.Char` / `fields.Many2one` / etc., and decorators like `@api.model`, `@api.depends`, `@api.constrains`, `@api.onchange` where appropriate.
 - If the input contains JavaScript, the underlying *logic* is reinterpreted into Odoo Python rather than transliterated line-by-line (e.g. a frontend validation becomes an `@api.constrains` method; a computed display value becomes an `@api.depends` compute method).
 
 ## How it works
@@ -40,8 +42,9 @@ If you want to run it as a **standalone app outside that environment** (e.g. you
 
 ## Usage notes / limitations
 
-- **Always review the output.** This is LLM-generated code — check inferred field types, `_name`, relations (`Many2one` vs `One2many` vs `Many2many`), and access rules before dropping it into a real Odoo module.
-- **Output is capped** at a fixed token budget per conversion. Very large files may get truncated — for big files, convert one class or function at a time.
+- **Always review the output.** This is LLM-generated code — check inferred field types, `_name`, relations (`Many2one` vs `One2many` vs `Many2many`), and access rules before dropping it into a real Odoo module. This matters *more* for chunked conversions, since each chunk is converted somewhat independently — you may need to merge/dedupe model classes and reconcile field names across chunks by hand afterward.
+- **Chunking is heuristic, not a real parser.** Splitting happens on lines with zero indentation that start with `class `, `def `, `function `, etc. Unusual formatting (e.g. deeply nested top-level conditionals, minified JS) may chunk less cleanly and fall back to plain line-count splitting.
+- **Large files take longer and cost more.** A 9,235-line file splits into ~36 chunks at ~260 lines each — that's 36 sequential API calls. Expect it to take several minutes, and note that many chunk calls will use more total tokens than one large call would (each carries its own system prompt overhead).
 - **No routes, ever.** By design, this tool will not generate `@http.route` controllers, even if your source code is a Flask/Django/Express route handler. It converts the *business logic* inside such handlers into Odoo model methods — you'd wire up any actual UI/controller layer separately in Odoo (views, server actions, etc.).
 - Language hint (Auto / Python / JavaScript) is a hint to the model, not a strict parser — mixed-language snippets are supported.
 
