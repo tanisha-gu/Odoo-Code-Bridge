@@ -1,6 +1,7 @@
 # Odoo Code Bridge
 
-Convert backend Python (or JavaScript) code into idiomatic **Odoo ORM Python code** — models, fields, and business-logic methods. No HTTP controllers or routes are ever generated; output is model-level code only (meant to be called from views, other models, server actions, or automated actions).
+Convert backend Python (or JavaScript) code into idiomatic **Odoo ORM Python code** — models, fields, and business-logic methods. No HTTP controllers or routes are ever generated; output is model-level code only (meant to be called from views, other models, server actions or automated actions).
+
 
 ## What it does
 
@@ -67,6 +68,7 @@ class Order:
         self.status = "confirmed"
         return self.status
 ```
+
 
 Typical output shape (abbreviated):
 ```python
