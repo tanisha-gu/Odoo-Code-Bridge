@@ -2,7 +2,7 @@
 
 Convert backend Python (or JavaScript) code into idiomatic **Odoo ORM Python code** — models, fields, and business-logic methods. No HTTP controllers or routes are ever generated; output is model-level code only (meant to be called from views, other models, server actions or automated actions).
 
-
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## What it does
 
 - Paste **or upload** (`.py`, `.js`, `.jsx`, `.ts`, `.txt`) plain Python or JavaScript backend/business logic.
